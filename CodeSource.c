@@ -1,6 +1,6 @@
 /*
-    Tournoi-WTA
-    Auteur: DA CONCEICAO SIMOES Mauro 
+    TournoiWTA
+    Auteurs: DA CONCEICAO Mauro
     Date de création: 07/10/2021
 */
 
@@ -71,7 +71,7 @@ typedef struct {
 
 // DEBUT SPRINT 1
 
-/* 
+/*
     Vérifie que le nombre de tournois est entre 1 et 10 et affecte ce nombre à la variable nbTournois de la structure
     [in-out] TournoiWTA ins
 */
@@ -98,7 +98,7 @@ int dansJoueuses(TournoiWTA* ins, const char nom_joueuse[lgMot + 1]) {
     return 0;
 }
 
-/*  
+/*
     trouve l'index de la joueuse dans dataJoueuses
     [in-out] TournoiWTA ins
     [in] char[lgMot+1] nom_joueuse, correspond au nom de la joueuse
@@ -147,6 +147,7 @@ void points_joueuse(TournoiWTA* ins, const int idxT) {
     }
 }
 
+
 /*
     trouve l'index du tournoi dans dataTournoi
     [in-out] TournoiWTA ins
@@ -163,6 +164,52 @@ int indexTournoi(TournoiWTA* ins, const char nomTournoi[lgMot + 1], const char a
     return -1;
 }
 
+/*
+    soustrait aux joueueses les points obtenues lors d'un tournoi donné
+    [in-out] TournoiWTA ins
+    [in] int idxT, index du tournoi
+*/
+void soustraction_points_joueuse(TournoiWTA* ins, int idxT) {
+    int i;
+    Joueuse perdante, gagnante;
+    /*pour toutes les joueuses du tournoi, si le nombre points à soustraire est inférieur au nombre de points que possède la joueuse
+    alors on soustrait les points qu'elles ont obtenu lors du tournoi sinon on lui affecte 0 points */
+    for (i = 126; i >= 0; i--) {
+        perdante = ins->dataJoueuses[ins->dataTournoi[idxT].dataMatch[i].idxPerdante];
+        if (i == 126) {
+            gagnante = ins->dataJoueuses[ins->dataTournoi[idxT].dataMatch[i].idxGagnante];
+            gagnante.points = (gagnante.points >= 1200) ? gagnante.points -= 2000 : 0;
+            ins->dataJoueuses[ins->dataTournoi[idxT].dataMatch[i].idxGagnante].points = gagnante.points;
+            perdante.points = (perdante.points >= 1200) ? perdante.points -= 1200 : 0;
+            ins->dataJoueuses[ins->dataTournoi[idxT].dataMatch[i].idxPerdante].points = perdante.points;
+        }
+        else if (i >= 124 && i < 126) {
+            perdante.points = (perdante.points >= 720) ? perdante.points -= 720 : 0;
+            ins->dataJoueuses[ins->dataTournoi[idxT].dataMatch[i].idxPerdante].points = perdante.points;
+        }
+        else if (i >= 120 && i < 124) {
+            perdante.points = (perdante.points >= 360) ? perdante.points -= 360 : 0;
+            ins->dataJoueuses[ins->dataTournoi[idxT].dataMatch[i].idxPerdante].points = perdante.points;
+        }
+        else if (i >= 112 && i < 120) {
+            perdante.points = (perdante.points >= 180) ? perdante.points -= 180 : 0;
+            ins->dataJoueuses[ins->dataTournoi[idxT].dataMatch[i].idxPerdante].points = perdante.points;
+        }
+        else if (i >= 96 && i < 112) {
+            perdante.points = (perdante.points >= 90) ? perdante.points -= 90 : 0;
+            ins->dataJoueuses[ins->dataTournoi[idxT].dataMatch[i].idxPerdante].points = perdante.points;
+        }
+        else if (i >= 64 && i < 96) {
+            perdante.points = (perdante.points >= 45) ? perdante.points -= 45 : 0;
+            ins->dataJoueuses[ins->dataTournoi[idxT].dataMatch[i].idxPerdante].points = perdante.points;
+        }
+        else {
+            perdante.points = (perdante.points >= 10) ? perdante.points -= 10 : 0;
+            ins->dataJoueuses[ins->dataTournoi[idxT].dataMatch[i].idxPerdante].points = perdante.points;
+        }
+    }
+}
+
 
 /*
     enregistre le tournoi dans dataTournoi
@@ -170,7 +217,7 @@ int indexTournoi(TournoiWTA* ins, const char nomTournoi[lgMot + 1], const char a
 */
 void enregistrement_tournoi(TournoiWTA* ins) {
     /*on initialise j à ins->idxJ et numeroT à ins->idxt car ils correspondent respectivement aux index qui suivent le dernier enregistrement s'il existe*/
-    int i,j = ins->idxJ, numeroT = ins->idxT;
+    int i, j = ins->idxJ, numeroT = ins->idxT;
     char gagnante[lgMot + 1], perdante[lgMot + 1];
     scanf("%s %s", ins->dataTournoi[numeroT].nomTournoi, ins->dataTournoi[numeroT].dateTournoi);
     for (i = 0; i < nbMatchsTournoi; i++) {
@@ -180,7 +227,7 @@ void enregistrement_tournoi(TournoiWTA* ins) {
             ins->dataTournoi[numeroT].dataMatch[i].idxGagnante = indexJoueuse(ins, gagnante);
             ins->dataTournoi[numeroT].dataMatch[i].idxPerdante = indexJoueuse(ins, perdante);
         }
-        else if (dansJoueuses(ins, gagnante) == 0){
+        else if (dansJoueuses(ins, gagnante) == 0) {
             strcpy(ins->dataJoueuses[j].nom, gagnante);
             ins->dataJoueuses[j].points = 0;
             ins->dataTournoi[numeroT].dataMatch[i].idxGagnante = j;
@@ -203,11 +250,11 @@ void enregistrement_tournoi(TournoiWTA* ins) {
             strcpy(ins->dataJoueuses[j].nom, perdante);
             ins->dataJoueuses[j].points = 0;
             ins->dataTournoi[numeroT].dataMatch[i].idxPerdante = j;
-            j ++;
+            j++;
             ins->idxJ = j;
         }
     }
-    points_joueuse(ins,numeroT);
+    points_joueuse(ins, numeroT);
     ins->idxT++;
 }
 
@@ -219,7 +266,7 @@ void affichage_matchs_tournoi(TournoiWTA* ins) {
     int i, indexT;
     Joueuse gagnante, perdante;
     char nomTournoi[lgMot + 1], dateTournoi[lgMot + 1];
-    scanf("%s %s", nomTournoi,dateTournoi);
+    scanf("%s %s", nomTournoi, dateTournoi);
     indexT = indexTournoi(ins, nomTournoi, dateTournoi);
     if (indexT == -1) {
         printf("tournoi inconnu");
@@ -299,9 +346,9 @@ void tri_joueuses_nom(Joueuse joueuses[nbJoueusesTournoi]) {
     for (i = 0; i < nbJoueusesTournoi; i++) {
         for (j = 0; j < nbJoueusesTournoi; j++) {
             if (strcmp(joueuses[i].nom, joueuses[j].nom) < 0) {
-                temporaire=joueuses[i];
-                joueuses[i]= joueuses[j];
-                joueuses[j]= temporaire;
+                temporaire = joueuses[i];
+                joueuses[i] = joueuses[j];
+                joueuses[j] = temporaire;
             }
         }
     }
@@ -312,27 +359,34 @@ void tri_joueuses_nom(Joueuse joueuses[nbJoueusesTournoi]) {
     [in-out] TournoiWTA ins
 */
 void affichage_joueuses_tournoi(TournoiWTA* ins) {
-    int i=0,m=0;
+    int i = 0, m = 0,x;
     char nomTournoi[lgMot + 1], dateTournoi[lgMot + 1];
     Joueuse joueuses[nbJoueusesTournoi];
     scanf("%s %s", nomTournoi, dateTournoi);
     int idxT = indexTournoi(ins, nomTournoi, dateTournoi);
-    if (idxT == -1) {
-        printf("tournoi inconnu");
+    for (x = 0; x < idxT; x++) {
+        soustraction_points_joueuse(ins, x);
     }
-    else {
-        /*ci-dessous on rempli la liste des joueuses du tournoi*/
-        while (m < 64) {
-            joueuses[i] = ins->dataJoueuses[ins->dataTournoi[idxT].dataMatch[m].idxGagnante];
-            joueuses[++i] = ins->dataJoueuses[ins->dataTournoi[idxT].dataMatch[m].idxPerdante];
-            i++;
-            m++;
-        }
-        tri_joueuses_nom(joueuses);
-        printf("%s %s\n", nomTournoi, dateTournoi);
-        for (i = 0; i < nbJoueusesTournoi; ++i) {
-            printf("%s %d\n",joueuses[i].nom, joueuses[i].points);
-        }
+    for (x = idxT+1; x < (ins->idxT); x++) {
+        soustraction_points_joueuse(ins, x);
+    }
+    /*ci-dessous on rempli la liste des joueuses du tournoi*/
+    while (m < 64) {
+        joueuses[i] = ins->dataJoueuses[ins->dataTournoi[idxT].dataMatch[m].idxGagnante];
+        joueuses[++i] = ins->dataJoueuses[ins->dataTournoi[idxT].dataMatch[m].idxPerdante];
+        i++;
+        m++;
+    }
+    tri_joueuses_nom(joueuses);
+    printf("%s %s\n", nomTournoi, dateTournoi);
+    for (i = 0; i < nbJoueusesTournoi; ++i) {
+        printf("%s %d\n", joueuses[i].nom, joueuses[i].points);
+    }
+    for (x = 0; x < idxT; x++) {
+        points_joueuse(ins, x);
+    }
+    for (x = idxT + 1; x < (ins->idxT); x++) {
+        points_joueuse(ins, x);
     }
 }
 
@@ -374,51 +428,7 @@ void tri_joueuses_points(TournoiWTA* ins, Joueuse listeJ[nbJoueusesTournoi * max
     }
 }
 
-/*
-    soustrait aux joueueses les points obtenues lors d'un tournoi donné
-    [in-out] TournoiWTA ins
-    [in] int idxT, index du tournoi
-*/
-void soustraction_points_joueuse(TournoiWTA* ins, int idxT) {
-    int i;
-    Joueuse perdante,gagnante;
-    /*pour toutes les joueuses du tournoi, si le nombre points à soustraire est inférieur au nombre de points que possède la joueuse 
-    alors on soustrait les points qu'elles ont obtenu lors du tournoi sinon on lui affecte 0 points */
-    for (i = 126; i >= 0; i--) {
-        perdante = ins->dataJoueuses[ins->dataTournoi[idxT].dataMatch[i].idxPerdante];
-        if (i == 126) {
-            gagnante = ins->dataJoueuses[ins->dataTournoi[idxT].dataMatch[i].idxGagnante];
-            gagnante.points = (gagnante.points >= 1200) ? gagnante.points-= 2000 : 0;
-            ins->dataJoueuses[ins->dataTournoi[idxT].dataMatch[i].idxGagnante].points = gagnante.points;
-            perdante.points = (perdante.points>=1200) ? perdante.points-= 1200 : 0;
-            ins->dataJoueuses[ins->dataTournoi[idxT].dataMatch[i].idxPerdante].points = perdante.points;
-        }
-        else if (i >= 124 && i < 126) {
-            perdante.points = (perdante.points >= 720) ? perdante.points-= 720 : 0;
-            ins->dataJoueuses[ins->dataTournoi[idxT].dataMatch[i].idxPerdante].points = perdante.points;
-        }
-        else if (i >= 120 && i < 124) {
-            perdante.points = (perdante.points >= 360) ? perdante.points-= 360 : 0;
-            ins->dataJoueuses[ins->dataTournoi[idxT].dataMatch[i].idxPerdante].points = perdante.points;
-        }
-        else if (i >= 112 && i < 120) {
-            perdante.points = (perdante.points >= 180) ? perdante.points-= 180 : 0;
-            ins->dataJoueuses[ins->dataTournoi[idxT].dataMatch[i].idxPerdante].points = perdante.points;
-        }
-        else if (i >= 96 && i < 112) {
-            perdante.points = (perdante.points >= 90) ? perdante.points-= 90 : 0;
-            ins->dataJoueuses[ins->dataTournoi[idxT].dataMatch[i].idxPerdante].points = perdante.points;
-        }
-        else if (i >= 64 && i < 96) {
-            perdante.points = (perdante.points >= 45) ? perdante.points-= 45 : 0;
-            ins->dataJoueuses[ins->dataTournoi[idxT].dataMatch[i].idxPerdante].points = perdante.points;
-        }
-        else{
-            perdante.points = (perdante.points >= 10) ? perdante.points-= 10 : 0;
-            ins->dataJoueuses[ins->dataTournoi[idxT].dataMatch[i].idxPerdante].points = perdante.points;
-        }
-    }
-}
+
 
 
 /*
@@ -426,20 +436,20 @@ void soustraction_points_joueuse(TournoiWTA* ins, int idxT) {
     [in-out] TournoiWTA ins
 */
 void afficher_classement(TournoiWTA* ins) {
-    int i,j;
+    int i, j;
     Joueuse listeJ[nbJoueusesTournoi * maxTournois];
     /*on soustrait au total des points de chaque joueuse les points obtenus lors des tournois se situant avant les 4 tournois choisis pour le classement */
     for (i = 0; i < (ins->idxT) - 4; i++) {
         soustraction_points_joueuse(ins, i);
     }
     tri_joueuses_points(ins, listeJ);
-    for (j = ins->idxJ - 1; j >=0; j--) {
+    for (j = ins->idxJ-1; j >= 0; j--) {
         if (listeJ[j].points >= 10) {
             printf("%s %d\n", listeJ[j].nom, listeJ[j].points);
         }
     }
     /*apres avoir affiché le classement on rajoute les points qu'avaient été soustraits afin d'obtenir à nouveau le total sur tous les tournois*/
-    for (i = 0; i <(ins->idxT) - 4; i++) {
+    for (i = 0; i < (ins->idxT) - 4; i++) {
         points_joueuse(ins, i);
     }
 }
@@ -468,7 +478,7 @@ int main() {
         }
         else if (strcmp(mot, "affichage_joueuses_tournoi") == 0) {
             affichage_joueuses_tournoi(&tableTournois);
-        } 
+        }
         else if (strcmp(mot, "afficher_classement") == 0) {
             afficher_classement(&tableTournois);
         }
